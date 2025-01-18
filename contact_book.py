@@ -16,12 +16,17 @@ class Name(Field): # For storing contact name
 class Phone(Field): # For storing contact phone numbers
     def __init__(self, value):
         super().__init__(value)
-        if len(value) != 10 or not value.isdigit():
-            raise ValueError('Your phone does not meet requirements. Must be 10 numbers')
+        self.longenough = self.__is_10(value)
+        
     def __eq__(self, other):
         if isinstance(other, Phone):
             return self.value == other.value
         return False
+    
+    def __is_10(self, value):
+        if len(value) != 10 or not value.isdigit():
+            raise ValueError('Your phone does not meet requirements. Must be 10 numbers')
+        else: pass
 
 class Record: # For storing contact information, including name and phone list.
     def __init__(self, name):
