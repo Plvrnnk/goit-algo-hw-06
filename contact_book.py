@@ -1,7 +1,7 @@
 from collections import UserDict
 
-class LenException(Exception):
-    pass
+# class LenException(Exception):
+    # pass
 
 class Field: # Base class for record fields.
     def __init__(self, value):
@@ -16,8 +16,8 @@ class Name(Field): # For storing contact name
 class Phone(Field): # For storing contact phone numbers
     def __init__(self, value):
         super().__init__(value)
-        if len(value) != 10:
-            raise LenException('Your phone does not meet requirements. Must be 10 nums')
+        if len(value) != 10 or not value.isdigit():
+            raise ValueError('Your phone does not meet requirements. Must be 10 numbers')
     def __eq__(self, other):
         if isinstance(other, Phone):
             return self.value == other.value
@@ -35,26 +35,23 @@ class Record: # For storing contact information, including name and phone list.
         return self.phones
     
     def remove_phone(self, phone):
-        try:
-            phone = Phone(phone)
-            for num in self.phones:
-                if num.value == phone.value:
-                    self.phones.remove(num)
-        except ValueError:
-            raise ValueError
+        i = self.find_phone(Phone(phone).value)
+        if i:
+            self.phones.remove(i)
+        else: raise ValueError("Phone is not found. Can't remove phone.")
+        
     def edit_phone(self, phone, new_phone: str):
-        try:
-            self.find_phone(phone)
+        i = self.find_phone(phone)
+        if i:
             self.remove_phone(phone)
             self.add_phone(new_phone)
-        except ValueError:
-            raise ValueError
-               
+        else: raise ValueError('Phone is not found.')
+              
     def find_phone(self, phone):
-        phone = Phone(phone)
-        if phone in self.phones:
-            return phone
-        else: return None
+        for p in self.phones:
+            if p.value == phone:
+                return p
+            else: return None
            
     def __str__(self) -> str:
         return (f"Contact name: {self.name.value}, phones: {[p.value for p in self.phones]}")
@@ -79,6 +76,7 @@ class AddressBook(UserDict): # For storing and managing records.
         
     def __str__(self):
         return '\n'.join(f"Contact name: {recordname}, phones: {recordphone}" for recordname, recordphone in self.data.items())
+    
 
 
 book = AddressBook() # Creating a new address book
@@ -101,7 +99,7 @@ print(book)
 
 # Finding and editing the phone for John
 john = book.find("John")
-john.edit_phone("1234567890", "1112223333")
+john.edit_phone("1234567890", "1112223330")
 
 print(john)  # Contact name: John, phones: 1112223333; 5555555555
 
