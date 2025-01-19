@@ -16,17 +16,13 @@ class Name(Field): # For storing contact name
 class Phone(Field): # For storing contact phone numbers
     def __init__(self, value):
         super().__init__(value)
-        self.longenough = self.__is_10(value)
+        if len(value) != 10 or not value.isdigit():
+            raise ValueError('Your phone does not meet requirements. Must be 10 numbers')
         
     def __eq__(self, other):
         if isinstance(other, Phone):
             return self.value == other.value
         return False
-    
-    def __is_10(self, value):
-        if len(value) != 10 or not value.isdigit():
-            raise ValueError('Your phone does not meet requirements. Must be 10 numbers')
-        else: pass
 
 class Record: # For storing contact information, including name and phone list.
     def __init__(self, name):
@@ -48,15 +44,15 @@ class Record: # For storing contact information, including name and phone list.
     def edit_phone(self, phone, new_phone: str):
         i = self.find_phone(phone)
         if i:
-            self.remove_phone(phone)
             self.add_phone(new_phone)
+            self.remove_phone(phone)
         else: raise ValueError('Phone is not found.')
               
     def find_phone(self, phone):
         for p in self.phones:
             if p.value == phone:
                 return p
-            else: return None
+        else: return None
            
     def __str__(self) -> str:
         return (f"Contact name: {self.name.value}, phones: {[p.value for p in self.phones]}")
@@ -82,7 +78,6 @@ class AddressBook(UserDict): # For storing and managing records.
     def __str__(self):
         return '\n'.join(f"Contact name: {recordname}, phones: {recordphone}" for recordname, recordphone in self.data.items())
     
-
 
 book = AddressBook() # Creating a new address book
 
